@@ -4,12 +4,18 @@
 
 ```console
 sudo apt install nginx
+sudo systemctl enable nginx
+sudo systemctl start nginx
 ```
 
 ##### index.html
 ```html
 <h1>hello nginx</h1>
 ```
+
+![nginx up and running](https://user-images.githubusercontent.com/23631617/142185433-971dd4a5-fe65-4b9d-9d0d-93c93d4a4984.png)
+
+---
 
 2. What are nginx header security and its uses. And also implement in the test.conf file.
 
@@ -24,11 +30,11 @@ browser to automatically reject camera, microphone, geolocation and other sensit
 permissions. I've also explained in brief about the use of each security headers
 in the following config.
 
-##### test.conf
+##### /etc/nginx/sites-available/test.conf
 ```console
 server {
 	listen 80 default_server;
-	listen [::]:82 default_server;
+	listen [::]:80 default_server;
 
 	root /var/www/html;
 
@@ -65,3 +71,22 @@ server {
     add_header Referrer-Policy "strict-origin-when-cross-origin" always;
 }
 ```
+
+We need to enable the config, test, then restart nginx.
+
+```console
+sudo ln -s /etc/nginx/sites-available/test.conf /etc/nginx/sites-enabled/
+sudo systemctl restart nginx
+```
+
+![Append Security Headers](https://user-images.githubusercontent.com/23631617/142187615-3ef79a28-268b-478a-be50-f353fafb1caa.png)
+
+---
+
+3. Nginx Reverse proxy all http requests to nodes js api.
+
+4. Create a test2.conf and listen on port 82 and  to “ location /test/” with message “ test is successful”.
+
+5. Reverse proxy all http traffic of port 82 to port 85.
+
+6. Install LEMP stack (avoid installing mysql) and open info.php on port 80 and print message info.php.
