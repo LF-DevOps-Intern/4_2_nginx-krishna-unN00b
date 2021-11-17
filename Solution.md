@@ -85,11 +85,13 @@ sudo systemctl restart nginx
 
 3. Nginx Reverse proxy all http requests to nodes js api.
 
+```
     location / {
             proxy_set_header X-Forwarded-For $remote_addr
             proxy_set_header Host $http_host;
             proxy_pass http://127.0.0.1:6080;
     }   
+```
 
 ![NodeJS and nginx](https://user-images.githubusercontent.com/23631617/142189862-aa8a60ac-e961-4315-b951-de09c2626763.png)
 
@@ -117,7 +119,6 @@ sudo systemctl restart nginx
 # MySQL: skipping
 
 # PHP
-```console
 sudo apt install php php-fpm
 ```
 
