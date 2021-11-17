@@ -85,8 +85,82 @@ sudo systemctl restart nginx
 
 3. Nginx Reverse proxy all http requests to nodes js api.
 
+    location / {
+            proxy_set_header X-Forwarded-For $remote_addr
+            proxy_set_header Host $http_host;
+            proxy_pass http://127.0.0.1:6080;
+    }   
+
+![NodeJS and nginx](https://user-images.githubusercontent.com/23631617/142189862-aa8a60ac-e961-4315-b951-de09c2626763.png)
+
+![nginx as a proxy to nodeJS](https://user-images.githubusercontent.com/23631617/142189369-5d02402b-2073-4878-96fb-425618590deb.png)
+
+---
+
 4. Create a test2.conf and listen on port 82 and  to “ location /test/” with message “ test is successful”.
+
+![tes2 conf](https://user-images.githubusercontent.com/23631617/142190566-d41b07ea-f030-44ed-95ed-5f9061660f84.png)
+
+---
 
 5. Reverse proxy all http traffic of port 82 to port 85.
 
+![Reverse proxy port 82 to 85](https://user-images.githubusercontent.com/23631617/142191545-23887774-f753-4c2b-8b69-4477595a2abd.png)
+
+---
+
 6. Install LEMP stack (avoid installing mysql) and open info.php on port 80 and print message info.php.
+
+```console
+# Linux: already installed as VM
+# Nginx: already installed
+# MySQL: skipping
+
+# PHP
+```console
+sudo apt install php php-fpm
+```
+
+We need to edit `/etc/php/7.4/fpm/php.ini` and add this line in order to prevent CGI from exectuting PHP scripts
+that don't exactly match the file name in the HTTP request. 
+```
+cgi.fix_pathinfo=0
+```
+
+Then we need to restart fpm.
+```
+sudo systemctl restart php7.4-fpm.service
+```
+
+We then create info.php.
+```php
+<?php
+    phpinfo();
+?>
+```
+
+Finally, we make a new Nginx config to listen on port 80 and serve info.php using fpm and deny access to `.ht`.
+```
+server {
+    listen 80 default_server;
+    listen [::]:80 default_server;
+
+    root /var/www/html;
+    index info.php;
+
+    location / {
+        try_files $uri $uri/ =404;
+    }
+
+    location ~ \.php$ {
+        include snippets/fastcgi-php.conf;
+        fastcgi_pass unix:/run/php/php-fpm.sock;
+    }
+
+    location ~ /\.ht {
+        deny all;
+    }
+}
+```
+
+![Display phpinfo from info.php](https://user-images.githubusercontent.com/23631617/142194627-a5d440a9-6915-45c0-ab2a-6903b3c6b00a.png)
