@@ -101,11 +101,29 @@ sudo systemctl restart nginx
 
 4. Create a test2.conf and listen on port 82 and  to “ location /test/” with message “ test is successful”.
 
+We create a `/test/index.html` file inside of our root directory then inside `test2.conf`, match the path `/test/`. And we listen to port 82.
+
+##### test2.conf
+```console
+server {
+        listen 82 default_server;
+        listen [::]:82 default_server;
+
+        root /var/www/html;
+        index index.html index.htm index.nginx-debian.html;
+
+location /test/ {
+                try_files $uri/ = 404;
+        }
+```
+
 ![tes2 conf](https://user-images.githubusercontent.com/23631617/142190566-d41b07ea-f030-44ed-95ed-5f9061660f84.png)
 
 ---
 
 5. Reverse proxy all http traffic of port 82 to port 85.
+
+As in question number 3, we can create a new config file which listens on port 85, then use `proxy_pass 127.0.0.1:82`, create its symlink in sites-enabled directory, then restart nginx service.
 
 ![Reverse proxy port 82 to 85](https://user-images.githubusercontent.com/23631617/142191545-23887774-f753-4c2b-8b69-4477595a2abd.png)
 
